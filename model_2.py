@@ -76,7 +76,7 @@ def make_the_rewards_plot(choice):
     env = gym.make('TextFlappyBird-v0', height = 15, width = 20, pipe_gap = 4)
     agent = SarsaLambdaAgent(env.action_space , lam=choice)
 
-    episodes = 20000
+    episodes = 30000
     rewards = []
 
     log_epsilon = []
@@ -92,18 +92,13 @@ def make_the_rewards_plot(choice):
         while not done:
             next_state, _, done, _ , _ = env.step(action)
 
-
             y_diff = next_state[1]
-            # x_diff = next_state[0]
-
             reward = -abs(y_diff) / 15
-
 
             next_action = agent.choose_action(next_state)
             agent.update(state, action, reward, next_state, next_action, done)
             state, action = next_state, next_action
             total_reward += reward
-
             action_counts[action] += 1
 
         rewards.append(total_reward)
@@ -113,34 +108,26 @@ def make_the_rewards_plot(choice):
     return rewards
 
 
+from multiprocessing import Pool
 
 if __name__ == "__main__":
-
-    # make 10 values from 0 to 1
-    values_to_test = np.linspace(0, 1, 2)
-
-    # setup 10 threads to run the code and collect the rewards lists and choices to plot
-    import threading
-    threads = []
-    rewards = []
-    for choice in values_to_test:
-        t = threading.Thread(target=lambda: rewards.append(make_the_rewards_plot(choice)))
-        threads.append(t)
-        t.start()
-
-    for t in threads:
-        t.join()
-
-    # plot the rewards
-    for i, reward in enumerate(rewards):
-        smoothed_rewards = pd.Series(reward).rolling(window=50).mean()
-        plt.plot(reward, label=f"Lambda = {values_to_test[i]:.2f}")
-        plt.plot(smoothed_rewards)
-        plt.xlabel("Episode")
-        plt.ylabel("Reward")
-        plt.title("Reward vs Episode")
-        plt.legend()
-        plt.show()
+    values_to_test = np.linspace(0, 1, 11)
+    
+    # Setup process pool and execute
+    with Pool() as pool:
+        results = pool.map(make_the_rewards_plot, values_to_test)
+    
+    # Plot the rewards in subplots
+    fig, axs = plt.subplots(1, len(values_to_test), figsize=(20, 5))
+    for i, rewards in enumerate(results):
+        smoothed_rewards = np.convolve(rewards, np.ones(50)/50, mode='valid')
+        axs[i].plot(rewards)
+        axs[i].plot(smoothed_rewards)
+        axs[i].set_title(f'Lambda = {values_to_test[i]:.1f}')
+        axs[i].set_xlabel("Episode")
+        axs[i].set_ylabel("Reward")
+        axs[i].axhline(0, color='black', lw=1)
+    plt.show()
 
     
 
