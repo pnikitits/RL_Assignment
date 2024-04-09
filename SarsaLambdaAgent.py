@@ -1,6 +1,6 @@
+from tqdm import tqdm
 import numpy as np
 np.random.seed(11)
-from tqdm import tqdm
 
 
 
@@ -33,7 +33,6 @@ class SarsaLambdaAgent:
 
     def update(self, state, action, reward, next_state, next_action, done):
         sa_pair = (state, action)
-        # next_sa_pair = (next_state, next_action)
         
         q_current = self.get_Q(state, action)
         q_next = self.get_Q(next_state, next_action) if not done else 0
@@ -63,11 +62,7 @@ def train_sarsa(env, agent, episodes):
         total_reward = 0
 
         while not done:
-            next_state , _ , done , _ , _ = env.step(action)
-
-            y_diff = next_state[1]
-            reward = -abs(y_diff) / 15 # Reward based on vertical distance from the center
-
+            next_state , reward , done , _ , _ = env.step(action)
             next_action = agent.choose_action(next_state)
             agent.update(state, action, reward, next_state, next_action, done)
             state, action = next_state, next_action

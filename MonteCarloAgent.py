@@ -1,6 +1,6 @@
+from tqdm import tqdm
 import numpy as np
 np.random.seed(11)
-from tqdm import tqdm
 
 
 
@@ -66,11 +66,7 @@ def train_monte_carlo(env , agent , episodes):
 
         while not done:
             action = agent.choose_action(state)
-            next_state , _ , done , _ , _ = env.step(action)
-
-            y_diff = next_state[1]
-            reward = -abs(y_diff) / 15
-
+            next_state , reward , done , _ , _ = env.step(action)
             episode_memory.append((state , action , reward))
             state = next_state
             total_reward += reward
@@ -81,4 +77,3 @@ def train_monte_carlo(env , agent , episodes):
     env.close()
     l500_mean = np.mean(rewards[-500:])
     return agent , rewards , l500_mean
-    

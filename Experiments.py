@@ -10,8 +10,7 @@ import time
 
 
 
-def play_game(env, agent):
-    #obs = env.reset()
+def play_game(env, agent , fast=False):
     state = env.reset()[0]
 
     while True:
@@ -21,7 +20,9 @@ def play_game(env, agent):
 
         os.system("clear")
         sys.stdout.write(env.render())
-        time.sleep(0.2)
+
+        if not fast:
+            time.sleep(0.2)
 
         if done:
             break
@@ -73,7 +74,7 @@ def run_monte_carlo(play = False):
 
     agent = MonteCarloAgent(env.action_space , MonteCarloSettings)
 
-    episodes = 10000
+    episodes = 50000
     agent , rewards , l500_mean = train_monte_carlo(env, agent, episodes)
 
     if play:
@@ -89,7 +90,5 @@ def run_monte_carlo(play = False):
 
 
 if __name__ == "__main__":
-    # run_sarsa(play=False)
-    run_monte_carlo(play=False)
-    
-    
+    #run_sarsa(play=False)
+    run_monte_carlo(play=True)
