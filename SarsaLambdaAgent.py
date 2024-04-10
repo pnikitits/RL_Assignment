@@ -1,6 +1,6 @@
 from tqdm import tqdm
 import numpy as np
-np.random.seed(11)
+import wandb
 
 
 
@@ -52,7 +52,10 @@ class SarsaLambdaAgent:
 
 
 def train_sarsa(env, agent, episodes):
+    np.random.seed(11)
+
     rewards = []
+    log_epsilons = []
 
     for _ in tqdm(range(episodes)):
         state = env.reset()[0]
@@ -68,8 +71,13 @@ def train_sarsa(env, agent, episodes):
             state, action = next_state, next_action
             total_reward += reward
 
+        wandb.log({"episode reward": np.mean(total_reward)})
         rewards.append(total_reward)
+        log_epsilons.append(agent.epsilon)
 
+        if total_reward > 200:
+            break
+
+    wandb.log({"avg_reward": np.mean(rewards)})
     env.close()
-    l500_mean = np.mean(rewards[-500:])
-    return agent , rewards , l500_mean
+    return agent , rewards , log_epsilons

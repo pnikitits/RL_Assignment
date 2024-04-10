@@ -1,6 +1,6 @@
 from tqdm import tqdm
 import numpy as np
-np.random.seed(11)
+
 
 
 
@@ -55,6 +55,8 @@ class MonteCarloAgent:
 
 
 def train_monte_carlo(env , agent , episodes):
+    np.random.seed(11)
+    
     rewards = []
 
     for _ in tqdm(range(episodes)):

@@ -32,36 +32,45 @@ def play_game(env, agent , fast=False):
 
 
 
-def run_sarsa(play = False):
+def run_sarsa(play , fast):
     env = gym.make('TextFlappyBird-v0', height = 15, width = 20, pipe_gap = 4)
 
     SarsaSettings = {
         "alpha": 0.12,
-        "gamma": 0.99,
+        "gamma": 0.9999,
         "lam": 0.9,
         "epsilon": 0.1,
-        "epsilon_decay": 0.999,
-        "epsilon_min": 0.01
+        "epsilon_decay": 0.99999,
+        "epsilon_min": 0.0001
     }
 
     agent = SarsaLambdaAgent(env.action_space , SarsaSettings)
 
     episodes = 10000
-    agent , rewards , l500_mean = train_sarsa(env, agent, episodes)
+    agent , rewards , log_epsilons = train_sarsa(env, agent, episodes)
 
     if play:
-        play_game(env, agent)
+        play_game(env, agent , fast)
     else:
-        plt.plot(rewards)
-        plt.xlabel("Episode")
-        plt.ylabel("Reward")
-        plt.title("Reward vs Episode")
+        fig, axs = plt.subplots(2)
+        fig.suptitle("Sarsa Lambda Agent")
+
+        axs[0].plot(rewards)
+        axs[0].set_xlabel("Episode")
+        axs[0].set_ylabel("Reward")
+        axs[0].set_title("Reward vs Episode")
+
+        axs[1].plot(log_epsilons)
+        axs[1].set_xlabel("Episode")
+        axs[1].set_ylabel("Epsilon")
+        axs[1].set_title("Epsilon vs Episode")
+
         plt.show()
 
 
 
 
-def run_monte_carlo(play = False):
+def run_monte_carlo(play , fast):
     env = gym.make('TextFlappyBird-v0', height = 15, width = 20, pipe_gap = 4)
 
     MonteCarloSettings = {
@@ -78,7 +87,7 @@ def run_monte_carlo(play = False):
     agent , rewards , l500_mean = train_monte_carlo(env, agent, episodes)
 
     if play:
-        play_game(env, agent)
+        play_game(env, agent , fast)
     else:
         plt.plot(rewards)
         plt.xlabel("Episode")
@@ -90,5 +99,5 @@ def run_monte_carlo(play = False):
 
 
 if __name__ == "__main__":
-    #run_sarsa(play=False)
-    run_monte_carlo(play=True)
+    run_sarsa(play=True , fast=False)
+    # run_monte_carlo(play=True , fast=False)
